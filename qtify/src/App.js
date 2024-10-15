@@ -6,6 +6,8 @@ import Section from './components/Section/Section'
 import styles from "./App.module.css";
 import FAQ from "./components/FAQ/FAQ";
 
+// test comment
+
 const App = () => {
   const [topAlbumsData,setTopAlbumsData]=useState([])
   const [NewAlumsData,setNewAlumsData]=useState([])
