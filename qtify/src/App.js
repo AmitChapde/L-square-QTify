@@ -1,25 +1,129 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react'
+import Navbar from './components/Navbar/Navbar'
+import Hero from './components/Hero/Hero'
+import { fetchNewAlbums, fetchSongs, fetchTopAlbums } from './api/api'
+import Section from './components/Section/Section'
+import styles from "./App.module.css";
+import FAQ from "./components/FAQ/FAQ";
 
-function App() {
+const App = () => {
+  const [topAlbumsData,setTopAlbumsData]=useState([])
+  const [NewAlumsData,setNewAlumsData]=useState([])
+  const [songsData,setSongsData]=useState([])
+  const [filter,setFilter]=useState([])
+ 
+  const [value,setValue]=useState(0)
+
+  
+  const handleChange=(e,newValue)=>{
+    console.log(newValue,"newVal")
+      setValue(newValue)
+  }
+
+
+  const generateSongsData=(value)=>{
+    let key;
+    if(value===0)
+    {
+      filterData(songsData);
+      return 
+    }
+    else if(value===1)
+    {
+      key ="rock";
+
+    }
+    else if(value===2)
+    {
+      key="pop";
+    }
+    else if(value===3)
+    {
+      key="jazz";
+    }
+    else if(value===4)
+    {
+      key="blues";
+    }
+    const res=songsData.filter((item)=>item.genre.key===key)
+    filterData(res)
+
+  }
+  const filterData=(songs)=>{
+    setFilter(songs)
+  }
+const generateAllSongData=async ()=>{
+  try{
+    const res=await fetchSongs()
+    setSongsData(res);
+    setFilter(res)
+
+  }
+  catch(e)
+  {
+    console.error(e)
+  }
+}
+
+  const generateTopAlbums=async()=>{
+    try{
+      const data=await fetchTopAlbums();
+      // console.log(data)
+      setTopAlbumsData(data);
+    }
+    catch(e)
+    {
+      console.error(e)
+    }
+  }
+
+  const generateNewAlbums=async()=>{
+      try{
+        const data=await fetchNewAlbums();
+        // console.log(data)
+        setNewAlumsData(data);
+      }
+      catch(e)
+      {
+        console.error(e)
+      }
+  }
+  useEffect(()=>{
+    generateSongsData(value)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[value])
+
+  useEffect(()=>{
+   generateTopAlbums()
+   generateNewAlbums()
+   generateAllSongData()
+  },[])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Navbar/>
+      <Hero/>
+      {/* {
+        
+        topAlbumsData.map((topAlbum)=>
+          (<Card data={topAlbum} type="album" key={topAlbum.id}/>)
+        )
+
+      } */}
+      <div className={styles.sectionWrapper}>
+
+      <Section data={topAlbumsData} title="Top Albums" type="album"/>
+      <Section data={NewAlumsData} title="New Albums" type="album"/>
+      </div>
+      <div className={styles.songs}>
+      <Section data={filter} title="Songs" type="song" value={value} handleChange={handleChange} />
+      </div>
+      <div>
+        <FAQ />
+      </div>
     </div>
+    
   );
 }
 
-export default App;
+export default App
+
